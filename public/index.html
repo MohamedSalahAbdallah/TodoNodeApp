@@ -198,6 +198,18 @@
                         </tr>`;
               tbody.append(row);
             });
+            function fetchTodoById(id, callback) {
+              $.ajax({
+                url: `/todos/${id}`,
+                method: "GET",
+                success: function (todo) {
+                  callback(todo);
+                },
+                error: function () {
+                  alert("Todo not found");
+                },
+              });
+            }
 
             // Edit button click handler
             $(".edit-btn").click(function () {

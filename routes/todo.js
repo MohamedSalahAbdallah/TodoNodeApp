@@ -51,6 +51,33 @@ router.get("/", (req, res) => {
   });
 });
 
+// This route handles GET requests to retrieve a specific todo item from the database,
+// identified by its ID.
+// The route is defined with a dynamic parameter `:id`, which is extracted from the
+// request URL by Express.js.
+router.get("/:id", (req, res) => {
+  // Extract the todo ID from the request parameters
+  const todoId = req.params.id;
+
+  // Construct the SQL query to retrieve the todo item from the database
+  const query = "SELECT * FROM todos WHERE id = ?";
+
+  // Execute the SQL query with the todo ID as a parameter
+  db.query(query, [todoId], (error, results) => {
+    // If there was an error during the query execution, throw the error
+    if (error) throw error;
+
+    // Check if the query returned any results
+    if (results.length > 0) {
+      // If a result was found, send it as a JSON response
+      res.json(results[0]);
+    } else {
+      // If no result was found, send a 404 Not Found response with a message
+      res.status(404).json({ message: "Todo not found" });
+    }
+  });
+});
+
 // Update a todo with validation
 // This endpoint is used to update an existing todo item in the database
 router.put("/:id", validateTodo, (req, res) => {

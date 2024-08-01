@@ -8,19 +8,20 @@ This is a simple todo list application built using Node.js, Express, and MySQL. 
 - **View Todos**: View all the todo items in a table.
 - **Edit Todo**: Edit an existing todo item.
 - **Delete Todo**: Delete a todo item.
+- **Get Todo by ID**: Fetch a specific todo item by its ID.
 
 ## Technologies Used
 
-- **Node.js**: JavaScript runtime for server-side programming.
-- **Express**: Web framework for Node.js.
-- **MySQL**: Relational database to store the todo items.
+- **Node.js**: JavaScript runtime environment.
+- **Express**: Web application framework for Node.js.
+- **MySQL**: Relational database management system.
 - **Bootstrap**: CSS framework for styling the frontend.
-- **jQuery**: JavaScript library for DOM manipulation and AJAX requests.
+- **jQuery**: JavaScript library for DOM manipulation.
 
 ## Prerequisites
 
-- **Node.js** and **npm**: Install from [nodejs.org](https://nodejs.org/).
-- **MySQL**: Install from [mysql.com](https://www.mysql.com/).
+- **Node.js**: Install from [Node.js website](https://nodejs.org/).
+- **MySQL**: Install from [MySQL website](https://www.mysql.com/).
 
 ## Installation
 
@@ -37,56 +38,50 @@ This is a simple todo list application built using Node.js, Express, and MySQL. 
    npm install
    ```
 
-3. **Set up the MySQL database**:
-
-   - Open MySQL command line or MySQL Workbench.
-   - Run the following SQL commands to create the database and table:
-     ```sql
-     CREATE DATABASE todo_db;
-     USE todo_db;
-     CREATE TABLE todos (
-         id INT AUTO_INCREMENT PRIMARY KEY,
-         title VARCHAR(255) NOT NULL,
-         description TEXT NOT NULL,
-         completed BOOLEAN DEFAULT FALSE
-     );
-     ```
-
-4. **Create a MySQL user and grant permissions**:
+3. **Set up MySQL database**:
 
    ```sql
-   CREATE USER 'todo_user'@'localhost' IDENTIFIED BY 'password';
-   GRANT ALL PRIVILEGES ON todo_db.* TO 'todo_user'@'localhost';
-   FLUSH PRIVILEGES;
+   CREATE DATABASE todo_db;
+   USE todo_db;
+   CREATE TABLE todos (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       title VARCHAR(255) NOT NULL,
+       description TEXT,
+       completed BOOLEAN DEFAULT FALSE
+   );
    ```
 
-5. **Start the application**:
+4. **Configure the database connection**:
+   Update the `routes/todos.js` file with your MySQL connection details:
+
+   ```javascript
+   const connection = mysql.createConnection({
+     host: "localhost",
+     user: "todo_user",
+     password: "password",
+     database: "todo_db",
+   });
+   ```
+
+5. **Start the server**:
 
    ```bash
-   node index.js
+   npm start
    ```
 
-6. **Open your browser** and navigate to `http://localhost:3000`.
-
-## Project Structure
-
-- **index.js**: Entry point of the application.
-- **routes/todos.js**: Express routes for handling CRUD operations.
-- **public/index.html**: Main HTML file for the frontend.
-- **public/style.css**: CSS file for custom styles.
-- **public/script.js**: JavaScript file for handling frontend logic.
+6. **Open the application**:
+   Open your web browser and go to `http://localhost:3000`.
 
 ## API Endpoints
 
-- **GET /todos**: Retrieve all todo items.
-- **POST /todos**: Create a new todo item.
-- **PUT /todos/:id**: Update an existing todo item.
-- **DELETE /todos/:id**: Delete a todo item.
+### Create a New Todo (POST)
 
-## Frontend
-
-The frontend is built with HTML and Bootstrap for styling. jQuery is used for making AJAX requests to the backend and dynamically updating the DOM.
-
-## License
-
-This project is licensed under the MIT License.
+```sh
+curl -X POST http://localhost:3000/todos \
+-H "Content-Type: application/json" \
+-d '{
+    "title": "New Todo",
+    "description": "This is a new todo item",
+    "completed": false
+}'
+```
