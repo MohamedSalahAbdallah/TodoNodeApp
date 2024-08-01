@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="mb-4">Todo List</h1>
+      <button
+        class="btn btn-primary mb-4"
+        data-toggle="modal"
+        data-target="#addModal"
+      >
+        Add Todo
+      </button>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Completed</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="todo-table-body">
+          <!-- Todo items will be injected here by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add Modal -->
+    <div
+      class="modal fade"
+      id="addModal"
+      tabindex="-1"
+      aria-labelledby="addModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addModalLabel">Add Todo</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="add-form">
+              <div class="form-group">
+                <label for="add-title">Title</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="add-title"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="add-description">Description</label>
+                <textarea
+                  class="form-control"
+                  id="add-description"
+                  required
+                ></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Add Todo</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div
+      class="modal fade"
+      id="editModal"
+      tabindex="-1"
+      aria-labelledby="editModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel">Edit Todo</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="edit-form">
+              <div class="form-group">
+                <label for="edit-title">Title</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="edit-title"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="edit-description">Description</label>
+                <textarea
+                  class="form-control"
+                  id="edit-description"
+                  required
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="edit-completed">Completed</label>
+                <input type="checkbox" id="edit-completed" />
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Save changes
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div
+      class="modal fade"
+      id="deleteModal"
+      tabindex="-1"
+      aria-labelledby="deleteModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">Delete Todo</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this todo?</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-danger" id="delete-confirm">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Fetch and display todos
+        function loadTodos() {
+          $.get("/todos", function (data) {
+            const tbody = $("#todo-table-body");
+            tbody.empty();
+            data.forEach((todo) => {
+              const completed = todo.completed ? "Yes" : "No";
+              const row = `<tr data-id="${todo.id}">
+                            <td>${todo.id}</td>
+                            <td>${todo.title}</td>
+                            <td>${todo.description}</td>
+                            <td>${completed}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm edit-btn" data-toggle="modal" data-target="#editModal">Edit</button>
+                                <button class="btn btn-danger btn-sm delete-btn" data-toggle="modal" data-target="#deleteModal">Delete</button>
+                            </td>
+                        </tr>`;
+              tbody.append(row);
+            });
+
+            // Edit button click handler
+            $(".edit-btn").click(function () {
+              const tr = $(this).closest("tr");
+              const id = tr.data("id");
+              const title = tr.find("td:eq(1)").text();
+              const description = tr.find("td:eq(2)").text();
+              const completed = tr.find("td:eq(3)").text() === "Yes";
+
+              $("#edit-title").val(title);
+              $("#edit-description").val(description);
+              $("#edit-completed").prop("checked", completed);
+              $("#edit-form").data("id", id);
+            });
+
+            // Delete button click handler
+            $(".delete-btn").click(function () {
+              const tr = $(this).closest("tr");
+              const id = tr.data("id");
+              $("#delete-confirm").data("id", id);
+            });
+          });
+        }
+
+        loadTodos();
+
+        // Handle add form submission
+        $("#add-form").submit(function (e) {
+          e.preventDefault();
+          const title = $("#add-title").val();
+          const description = $("#add-description").val();
+
+          $.ajax({
+            url: "/todos",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ title, description }),
+            success: function () {
+              $("#addModal").modal("hide");
+              loadTodos();
+            },
+          });
+        });
+
+        // Handle edit form submission
+        $("#edit-form").submit(function (e) {
+          e.preventDefault();
+          const id = $(this).data("id");
+          const title = $("#edit-title").val();
+          const description = $("#edit-description").val();
+          const completed = $("#edit-completed").is(":checked");
+
+          $.ajax({
+            url: "/todos/" + id,
+            method: "PUT",
+            contentType: "application/json",
+            data: JSON.stringify({ title, description, completed }),
+            success: function () {
+              $("#editModal").modal("hide");
+              loadTodos();
+            },
+          });
+        });
+
+        // Handle delete confirmation
+        $("#delete-confirm").click(function () {
+          const id = $(this).data("id");
+
+          $.ajax({
+            url: "/todos/" + id,
+            method: "DELETE",
+            success: function () {
+              $("#deleteModal").modal("hide");
+              loadTodos();
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
