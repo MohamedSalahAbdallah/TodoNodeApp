@@ -1,0 +1,31 @@
+body {
+    padding-top: 20px;
+}
+
+.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.dark-mode .table {
+    color: #e0e0e0;
+}
+
+.dark-mode .table-bordered {
+    border: 1px solid #444444;
+}
+
+.dark-mode .btn-primary {
+    background-color: #1a73e8;
+    border-color: #1a73e8;
+}
+
+.dark-mode .btn-secondary {
+    background-color: #3a3b3c;
+    border-color: #3a3b3c;
+}
+
+.dark-mode .modal-content {
+    background-color: #333333;
+    color: #e0e0e0;
+}
